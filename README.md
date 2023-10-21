@@ -36,3 +36,16 @@ mix ecto.migrate
 + Câu lệnh tạo ra secret-key với guard: mix guardian.gen.secret
 
 + Thực hiện tạo migration với Guardian.DB: mix guardian.db.gen.migration
+
++ Lưu ý khi cấu hình Guardian.DB:
+- Cấu hình trong config/config.exs
+- Cấu hình trong tutorials_web/telemetry.ex
+- Cấu hình trong tutorials_web/auth/guardian.ex
+
++ mix help phx.new
+
++ Với các hàm defp tên hàm bắt đầu bằng _
+
++ Dấu <- được sử dụng để so sánh và gắn giá trị từ một biểu thức (expression) vào một biến hoặc cấu trúc dữ liệu khác.
+
++ Dấu -> được sử dụng để định nghĩa các hàm ẩn danh (anonymous function) hoặc hàm inline.

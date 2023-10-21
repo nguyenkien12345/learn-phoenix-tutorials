@@ -37,8 +37,14 @@ defmodule TutorialsWeb.Router do
     pipe_through [:api, :auth]
 
     get "/accounts", AccountController, :index
+    put "/accounts/update", AccountController, :update
+    get "/accounts/refresh_token", AccountController, :refresh_token
     get "/accounts/sign_out", AccountController, :sign_out
+    get "/accounts/user/:id", AccountController, :show_full_account
     get "/accounts/:id", AccountController, :show
-    post "/accounts/update", AccountController, :update
+
+    # get "/users", UserController, :index
+    # put "/users/update", UserController, :update
+    # get "/users/:id", UserController, :show
   end
 end

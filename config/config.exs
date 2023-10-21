@@ -39,7 +39,7 @@ config :phoenix, :json_library, Jason
 config :guardian, Guardian.DB,
   repo: Tutorials.Repo,             # Store tokens in the database defined by Tutorials.Repo.
   schema_name: "guardian_tokens",   # The name of the table or collection in the database that Guardian.DB will use to store tokens.
-  sweep_interval: 60
+  sweep_interval: 60                # 60 minutes
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

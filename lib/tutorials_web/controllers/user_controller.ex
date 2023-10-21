@@ -1,8 +1,8 @@
 defmodule TutorialsWeb.UserController do
   use TutorialsWeb, :controller
 
-  alias Tutorials.Users.Users
-  alias Tutorials.Users.User
+  alias TutorialsWeb.{Auth.Guardian, Auth.ErrorResponse}
+  alias Tutorials.{Accounts.Accounts, Accounts.Account, Users.Users, Users.User}
 
   action_fallback TutorialsWeb.FallbackController
 
@@ -24,10 +24,8 @@ defmodule TutorialsWeb.UserController do
     render(conn, :show, user: user)
   end
 
-  def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Users.get_user!(id)
-
-    with {:ok, %User{} = user} <- Users.update_user(user, user_params) do
+  def update(conn, %{"user" => user_params}) do
+    with {:ok, %User{} = user} <- Users.update_user(conn.assigns.account.user, user_params) do
       render(conn, :show, user: user)
     end
   end

@@ -57,6 +57,26 @@ defmodule Tutorials.Accounts.Accounts do
   end
 
   @doc """
+  Gets a single account.any() with user relationship
+
+  Returns 'nil' if the Account does not exist.
+
+  ## Examples
+
+      iex> get_full_account(1234567890)
+      %Account{}
+
+      iex> get_full_account(0987654321)
+      nil
+  """
+  def get_full_account(id) do
+    Account
+    |> where(id: ^id)
+    |> preload([:user])
+    |> Repo.one()
+  end
+
+  @doc """
   Creates a account.
 
   ## Examples

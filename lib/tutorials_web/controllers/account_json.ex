@@ -25,8 +25,26 @@ defmodule TutorialsWeb.AccountJSON do
     }
   end
 
-  def show_account_token(%{account: account, token: token}) do
-    data = %{id: account.id, email: account.email, token: token}
+  defp data_full_account(%Account{} = account) do
+    %{
+      id: account.id,
+      email: account.email,
+      user: %{
+        id: account.user.id,
+        full_name: account.user.full_name,
+        biography: account.user.biography,
+        gender: account.user.gender
+      }
+    }
+  end
+
+  def show_account_token(%{token: token}) do
+    data = %{token: token}
+    AccountResponse.success_response(data)
+  end
+
+  def show_full_account(%{account: account}) do
+    data = %{data: data_full_account(account)}
     AccountResponse.success_response(data)
   end
 

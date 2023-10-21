@@ -1,5 +1,5 @@
 defmodule TutorialsWeb.Auth.Pipeline do
-  use Guardian.Plug.Pipeline, otp_app: :tutorials,
+  use Guardian.Plug.Pipeline, otp_app: :tutorials,      # part of Guardian, to build an authentication and authorization pipeline.
   module: TutorialsWeb.Auth.Guardian,                   # Used for authentication and authorization
   error_handler: TutorialsWeb.Auth.GuardianErrorHandler # Handles errors during authentication.
 
