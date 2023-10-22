@@ -1,13 +1,13 @@
 defmodule TutorialsWeb.AccountJSON do
   alias Tutorials.Accounts.Account
-  alias TutorialsWeb.AccountResponse
+  alias TutorialsWeb.CustomResponse
 
   @doc """
   Renders a list of accounts.
   """
   def index(%{accounts: accounts}) do
     data = %{data: for(account <- accounts, do: data(account))}
-    AccountResponse.success_response(data)
+    CustomResponse.success_response(data)
   end
 
   @doc """
@@ -15,7 +15,7 @@ defmodule TutorialsWeb.AccountJSON do
   """
   def show(%{account: account}) do
     data = %{data: data(account)}
-    AccountResponse.success_response(data)
+    CustomResponse.success_response(data)
   end
 
   defp data(%Account{} = account) do
@@ -40,12 +40,12 @@ defmodule TutorialsWeb.AccountJSON do
 
   def show_account_token(%{token: token}) do
     data = %{token: token}
-    AccountResponse.success_response(data)
+    CustomResponse.success_response(data)
   end
 
   def show_full_account(%{account: account}) do
     data = %{data: data_full_account(account)}
-    AccountResponse.success_response(data)
+    CustomResponse.success_response(data)
   end
 
 end

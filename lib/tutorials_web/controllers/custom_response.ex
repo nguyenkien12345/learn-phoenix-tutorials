@@ -1,4 +1,4 @@
-defmodule TutorialsWeb.AccountResponse do
+defmodule TutorialsWeb.CustomResponse do
 
   # def success_response(data), do: %{data: data, status: true, timestamp: DateTime.utc_now()}
   # def error_response(error), do: %{error: error, status: false, timestamp: DateTime.utc_now()}

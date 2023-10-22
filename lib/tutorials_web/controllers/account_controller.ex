@@ -3,17 +3,13 @@ defmodule TutorialsWeb.AccountController do
 
   alias TutorialsWeb.{Auth.Guardian, Auth.ErrorResponse}
   alias Tutorials.{Accounts.Accounts, Accounts.Account, Users.Users, Users.User}
+  alias Tutorials.Utils.{Constants, Error, Validator}
 
   import TutorialsWeb.Auth.AuthorizedPlugAccount
 
   plug :is_authorized when action in [:show, :show_full_account, :update, :delete]
 
   action_fallback TutorialsWeb.FallbackController
-
-  def index(conn, _params) do
-    accounts = Accounts.list_accounts()
-    render(conn, :index, accounts: accounts)
-  end
 
   defp authorize_account(conn, email, hash_password) do
     case Guardian.authenticate(email, hash_password) do
@@ -23,8 +19,13 @@ defmodule TutorialsWeb.AccountController do
         |> put_status(:ok)
         |> render(:show_account_token, %{token: token})
       {:error, :unauthorized} ->
-          raise ErrorResponse.Unauthorized, message: "Email or password incorrect."
+          raise Error, code: Error.c_UNAUTHENTICATED()
     end
+  end
+
+  def index(conn, params) do
+    accounts = Accounts.list_accounts()
+    render(conn, :index, accounts: accounts)
   end
 
   def current_account(conn, %{}) do
@@ -33,16 +34,48 @@ defmodule TutorialsWeb.AccountController do
     |> render(conn, :show_full_account, account: conn.assigns.account)
   end
 
-  # account là request được phía fe truyền lên
-  def create(conn, %{"account" => account_params}) do
-    with {:ok, %Account{} = account} <- Accounts.create_account(account_params),
-         {:ok, %User{} = _user} <- Users.create_user(account, account_params) do
-        authorize_account(conn, account.email, account_params["hash_password"])
+  @api_param_schema_sign_up %{
+    email: [
+      type: :string,
+      format: Constants.c_EMAIL_FORMAT(),
+      required: true
+    ],
+    hash_password: [
+      type: :string,
+      required: true,
+      length: [{:min, 6}, {:max, 255}],
+    ]
+  }
+  def create(conn, params) do
+    params =
+    @api_param_schema_sign_up
+    |> Validator.parse(params)
+    |> Validator.get_validated_changes!()
+
+    %{email: email, hash_password: hash_password} = params
+
+    with {:ok, %Account{} = account} <- Accounts.create_account(params),
+         {:ok, %User{} = _user} <- Users.create_user(account, params) do
+        authorize_account(conn, email, hash_password)
     end
   end
 
-  # email và hash_password là request được phía fe truyền lên
-  def sign_in(conn, %{"email" => email, "hash_password" => hash_password}) do
+  @api_param_schema_sign_in %{
+    email: [
+      type: :string,
+      required: true
+    ],
+    hash_password: [
+      type: :string,
+      required: true
+    ]
+  }
+  def sign_in(conn, params) do
+    %{email: email, hash_password: hash_password} =
+    @api_param_schema_sign_in
+    |> Validator.parse(params)
+    |> Validator.get_validated_changes!()
+
     authorize_account(conn, email, hash_password)
   end
 
@@ -80,7 +113,7 @@ defmodule TutorialsWeb.AccountController do
           {:ok, account} = Accounts.update_account(conn.assigns.account, account_params)
           render(conn, :show, account: account)
       false ->
-        raise ErrorResponse.Unauthorized, message: "Password incorrect"
+        raise Error, code: Error.c_UNAUTHENTICATED()
     end
   end
 

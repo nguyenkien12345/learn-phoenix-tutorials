@@ -1,14 +1,7 @@
 defmodule TutorialsWeb.Router do
   use TutorialsWeb, :router
   use Plug.ErrorHandler
-
-  def handle_errors(conn, %{reason: %Phoenix.Router.NoRouteError{message: message}}) do
-    conn |> json(%{errors: message}) |> halt()
-  end
-
-  def handle_errors(conn, %{reason: %{message: message}}) do
-    conn |> json(%{errors: message}) |> halt()
-  end
+  alias Tutorials.Utils.{Error}
 
   # pipeline (process stream)
 
@@ -42,9 +35,29 @@ defmodule TutorialsWeb.Router do
     get "/accounts/sign_out", AccountController, :sign_out
     get "/accounts/user/:id", AccountController, :show_full_account
     get "/accounts/:id", AccountController, :show
+  end
 
-    # get "/users", UserController, :index
-    # put "/users/update", UserController, :update
-    # get "/users/:id", UserController, :show
+  # def handle_errors(conn, %{reason: %Phoenix.Router.NoRouteError{message: message}}) do
+  #   conn |> json(%{errors: message, status: false, timestamp: DateTime.utc_now()}) |> halt()
+  # end
+
+  # def handle_errors(conn, %{reason: %{message: message}}) do
+  #   conn |> json(%{errors: message, status: false, timestamp: DateTime.utc_now()}) |> halt()
+  # end
+
+  @impl Plug.ErrorHandler
+  def handle_errors(conn, %{kind: _kind, reason: reason, stack: _stack}) do
+    IO.puts("handle_errors")
+    IO.inspect(reason)
+    with {status, error} when not is_nil(error) <- Error.transform(reason) do
+      conn
+      |> put_status(status)
+      |> json(%{errors: error, status: false, timestamp: DateTime.utc_now()}) |> halt()
+    else
+      _ ->
+      conn
+      |> put_status(:internal_server_error)
+      |> json(%{errors: [%Error{code: Error.c_INTERNAL_SERVER_ERROR()}], status: false, timestamp: DateTime.utc_now()}) |> halt()
+    end
   end
 end
